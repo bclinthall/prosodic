@@ -7,14 +7,14 @@ app = Flask(__name__)
 def mark_word_variants(word_variants):
     for word in word_variants:
         if word.isMonoSyllab():
-            return [word.getToken()]
+            return [word.getToken().upper()]
         else:
             return [mark_word(word) for word in word_variants]
 
 
 def mark_word(word):
     if word.isMonoSyllab():
-        return word.getToken()
+        return word.getToken().upper()
     return ''.join([mark_syllable(syllable) for syllable in word.syllables()])
 
 
