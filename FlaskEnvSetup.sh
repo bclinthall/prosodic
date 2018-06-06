@@ -1,14 +1,14 @@
 #!/bin/bash
 
-APP_NAME=$1
+APP_NAME=${1:-prosodic}
 
 FLASK_ENV=${2:-development}
 echo "Environment type: $FLASK_ENV"
 
 
 echo "Creating environment for $APP_NAME"
-echo "conda create --name ${APP_NAME}_env flask pytest coverage"
-conda create --name ${APP_NAME}_env flask pytest coverage
+echo "conda create --name ${APP_NAME}_env python=2.7 flask"
+conda create --name ${APP_NAME}_env python=2.7 flask
 
 CONDA_DIR=$(dirname $(dirname $(which conda)))
 ACTIVATE_DIR="$CONDA_DIR/envs/${APP_NAME}_env/etc/conda/activate.d"
