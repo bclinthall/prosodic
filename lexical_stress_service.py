@@ -96,6 +96,7 @@ def mark_syllable(syllable, str_stress):
         for i, c in enumerate(syllable):
             if c in vowelsy:
                 return mark_lexical_stress(syllable, i)
+        return syllable
     else:
         return syllable.str_orth()
 
