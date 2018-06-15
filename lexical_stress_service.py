@@ -72,7 +72,6 @@ def revise_cluster_positions(vowel_cluster_positions, syl_count, token):
             or token[-2:] == u'es'
     ):
         del vowel_cluster_positions[-1]
-        del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count - 1) and token[-1] == u'y':
         vowel_cluster_positions.append(len(token) - 1)
 
@@ -113,12 +112,10 @@ def mark_line(content):
             syl_count = len(word.syllables())
             token = word.token.decode('utf-8')
 
-            if len(vowel_cluster_positions) == syl_count:
-                ok = True
-            else:
+            ok = len(vowel_cluster_positions) == syl_count
+            if not ok:
                 revise_cluster_positions(vowel_cluster_positions, syl_count, token)
-                if len(vowel_cluster_positions) == syl_count:
-                    ok = True
+                ok = len(vowel_cluster_positions) == syl_count
 
             if ok:
                 result = mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions)
@@ -134,7 +131,7 @@ def mark_line(content):
                 pass
                 # print (i, vowel_clusters_ct, syl_count, vowel_cluster_positions, token, result)
             else:
-                print ('##############', i, vowel_clusters_ct, syl_count, vowel_cluster_positions, token, result)
+                print ('##############', i, syl_count, vowel_cluster_positions, token, result)
         results.append(result)
     return u' '.join(results)
 
@@ -159,5 +156,5 @@ But, in a larger sense, we can not dedicate -- we can not consecrate -- we can n
 
 if __name__ == "__main__":
     # print(mark_content(lincoln))
-    app.run(host="198.211.105.27", port="5121")
+     app.run(host="198.211.105.27", port="5121")
 
