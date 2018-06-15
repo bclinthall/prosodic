@@ -13,7 +13,7 @@ from ipa import sampa2ipa
 #import prosodic
 
 DASHES=['--',u'–',u'—']
-REPLACE_DASHES = True
+REPLACE_DASHES = False 
 
 
 class Text(entity):
