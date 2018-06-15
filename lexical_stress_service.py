@@ -1,6 +1,6 @@
 import prosodic as p
 from flask import Flask, request
-showAlternatives = True
+showAlternatives = False 
 
 app = Flask(__name__)
 
