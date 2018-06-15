@@ -32,14 +32,14 @@ app = Flask(__name__)
 #         return " ".join([mark_word(word) for word in words])
 #
 
-vowels = 'aeiouAEIOU'
-vowelsy = 'aeiouyAEIOUY'
+vowels = u'aeiouAEIOU'
+vowelsy = u'aeiouyAEIOUY'
 
 
 class VowelClusterCounter:
     def __init__(self, word):
         letter_no = 0
-        token = word.token
+        token = word.token.decode('utf-8')
         vowel_clusters = 0
         while letter_no < len(token):
             if token[letter_no] in vowels:
@@ -52,7 +52,7 @@ class VowelClusterCounter:
 
 def find_vowel_clusters(word):
     letter_no = 0
-    token = word.token
+    token = word.token.decode('utf-8')
     vowel_cluster_positions = []
     while letter_no < len(token):
         if token[letter_no] in vowels:
@@ -65,14 +65,14 @@ def find_vowel_clusters(word):
 
 def revise_cluster_positions(vowel_cluster_positions, syl_count, token):
     vowel_clusters_ct = len(vowel_cluster_positions)
-    if vowel_clusters_ct == (syl_count + 1) and token[-1] == 'e':
+    if vowel_clusters_ct == (syl_count + 1) and token[-1] == u'e':
         del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count + 1) and (
-            token[-2:] =='ed'
-            or token[-2:] == 'es'
+            token[-2:] == u'ed'
+            or token[-2:] == u'es'
     ):
         del vowel_cluster_positions[-1]
-    elif vowel_clusters_ct == (syl_count - 1) and token[-1] == 'y':
+    elif vowel_clusters_ct == (syl_count - 1) and token[-1] == u'y':
         vowel_cluster_positions.append(len(token) - 1)
 
 def mark_lexical_stress(token, position):
@@ -82,7 +82,7 @@ def mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions):
     syls = word.syllables()
     for i, syl in enumerate(syls):
         if syl.str_stress() == 'P':
-            return mark_lexical_stress(word.token, vowel_cluster_positions[i])
+            return mark_lexical_stress(word.token.decode('utf-8'), vowel_cluster_positions[i])
 
 def mark_syllable(syllable, str_stress):
     if str_stress == 'P':
@@ -94,10 +94,10 @@ def mark_syllable(syllable, str_stress):
         return syllable
 
 def syl_text(syllable):
-    return syllable.str_orth()
+    return syllable.token.decode('utf-8')
 
 def mark_lexical_stress_by_prosodic(word, vowel_cluster_positions):
-    return ''.join([mark_syllable(syl_text(syllable), syllable.str_stress()) for syllable in word.syllables()])
+    return u''.join([mark_syllable(syl_text(syllable), syllable.str_stress()) for syllable in word.syllables()])
 
 
 def mark_line(content):
@@ -107,12 +107,11 @@ def mark_line(content):
     for i, word in enumerate(words):
         if word.isMonoSyllab():
             result = mark_syllable(syl_text(word.syllables()[0]), 'P')
-            # print (i, word.token, word.syllables()[0], result)
+            # print (i, word.token.decode('utf-8'), word.syllables()[0], result)
         else:
             vowel_cluster_positions = find_vowel_clusters(word)
             syl_count = len(word.syllables())
-            token = word.token
-
+            token = word.token.decode('utf-8')
             ok = len(vowel_cluster_positions) == syl_count
             if not ok:
                 revise_cluster_positions(vowel_cluster_positions, syl_count, token)
@@ -134,17 +133,18 @@ def mark_line(content):
             else:
                 print ('##############', i, syl_count, vowel_cluster_positions, token, result)
         results.append(result)
-    return ' '.join(results)
+    return u' '.join(results)
 
 
 def mark_content(content):
     lines = [mark_line(line) for line in content.split('\n')]
-    return '\n'.join(lines)
+    return u'\n'.join(lines)
 
 
 @app.route("/", methods=['POST'])
 def handle_request():
     content = request.data
+    content.decode('utf-8')
 #    print "============================="
 #    print "content: "
 #    print content
@@ -155,6 +155,6 @@ Now we are engaged in a great civil war, testing whether that nation, or any nat
 But, in a larger sense, we can not dedicate -- we can not consecrate -- we can not hallow -- this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us -- that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion -- that we here highly resolve that these dead shall not have died in vain -- that this nation, under God, shall have a new birth of freedom -- and that government of the people, by the people, for the people, shall not perish from the earth."""
 
 if __name__ == "__main__":
-    #print(mark_content(lincoln))
+    # print(mark_content(lincoln))
     app.run(host="198.211.105.27", port="5121")
 
