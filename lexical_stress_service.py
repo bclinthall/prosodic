@@ -86,17 +86,18 @@ def mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions):
 
 def mark_syllable(syllable, str_stress):
     if str_stress == 'P':
-        syllable = syllable.str_orth().decode('utf-8')
         for i, c in enumerate(syllable):
             if c in vowelsy:
                 return mark_lexical_stress(syllable, i)
         return syllable
     else:
-        return syllable.str_orth().decode('utf-8')
+        return syllable
 
+def syl_text(syllable):
+    return syllable.str_orth().decode('utf-8')
 
 def mark_lexical_stress_by_prosodic(word, vowel_cluster_positions):
-    return u''.join([mark_syllable(syllable, syllable.str_stress()) for syllable in word.syllables()])
+    return u''.join([mark_syllable(syl_text(syllable), syllable.str_stress()) for syllable in word.syllables()])
 
 
 def mark_line(content):
@@ -105,7 +106,7 @@ def mark_line(content):
     results = []
     for i, word in enumerate(words):
         if word.isMonoSyllab():
-            result = mark_syllable(word.syllables()[0], 'P')
+            result = mark_syllable(syl_text(word.syllables()[0]), 'P')
             # print (i, word.token.decode('utf-8'), word.syllables()[0], result)
         else:
             vowel_cluster_positions = find_vowel_clusters(word)
@@ -155,6 +156,6 @@ Now we are engaged in a great civil war, testing whether that nation, or any nat
 But, in a larger sense, we can not dedicate -- we can not consecrate -- we can not hallow -- this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us -- that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion -- that we here highly resolve that these dead shall not have died in vain -- that this nation, under God, shall have a new birth of freedom -- and that government of the people, by the people, for the people, shall not perish from the earth."""
 
 if __name__ == "__main__":
-    # print(mark_content(lincoln))
-     app.run(host="198.211.105.27", port="5121")
+    print(mark_content(lincoln))
+    # app.run(host="198.211.105.27", port="5121")
 
