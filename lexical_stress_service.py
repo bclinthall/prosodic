@@ -50,37 +50,31 @@ class VowelClusterCounter:
                 letter_no += 1
 
 
-def count_vowel_clusters(word):
+def find_vowel_clusters(word):
     letter_no = 0
     token = word.token.decode('utf-8')
-    vowel_clusters = 0
     vowel_cluster_positions = []
     while letter_no < len(token):
         if token[letter_no] in vowels:
-            vowel_clusters += 1
             vowel_cluster_positions.append(letter_no)
             while letter_no < len(token) and token[letter_no] in vowels:
                 letter_no += 1
         else:
             letter_no += 1
-    return vowel_clusters, vowel_cluster_positions
+    return vowel_cluster_positions
 
-def revise_cluster_positions(vowel_clusters_ct, vowel_cluster_positions, syl_count, token):
-    ok = False
+def revise_cluster_positions(vowel_cluster_positions, syl_count, token):
+    vowel_clusters_ct = len(vowel_cluster_positions)
     if vowel_clusters_ct == (syl_count + 1) and token[-1] == u'e':
-        ok = True
         del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count + 1) and (
             token[-2:] == u'ed'
             or token[-2:] == u'es'
     ):
-        ok = True
         del vowel_cluster_positions[-1]
         del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count - 1) and token[-1] == u'y':
-        ok = True
         vowel_cluster_positions.append(len(token) - 1)
-    return ok
 
 def mark_lexical_stress(token, position):
     return token[:position] + '`' + token[position:]
@@ -115,16 +109,16 @@ def mark_line(content):
             result = mark_syllable(word.syllables()[0], 'P')
             # print (i, word.token.decode('utf-8'), word.syllables()[0], result)
         else:
-            vowel_cluster_result = count_vowel_clusters(word)
-            vowel_clusters_ct = vowel_cluster_result[0]
-            vowel_cluster_positions = vowel_cluster_result[1]
+            vowel_cluster_positions = find_vowel_clusters(word)
             syl_count = len(word.syllables())
             token = word.token.decode('utf-8')
 
-            if vowel_clusters_ct == syl_count:
+            if len(vowel_cluster_positions) == syl_count:
                 ok = True
             else:
-                ok = revise_cluster_positions(vowel_clusters_ct, vowel_cluster_positions, syl_count, token)
+                revise_cluster_positions(vowel_cluster_positions, syl_count, token)
+                if len(vowel_cluster_positions) == syl_count:
+                    ok = True
 
             if ok:
                 result = mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions)
