@@ -69,13 +69,14 @@ def revise_cluster_positions(vowel_clusters_ct, vowel_cluster_positions, syl_cou
     ok = False
     if vowel_clusters_ct == (syl_count + 1) and token[-1] == u'e':
         ok = True
-        vowel_cluster_positions = vowel_cluster_positions[:-1]
+        del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count + 1) and (
             token[-2:] == u'ed'
             or token[-2:] == u'es'
     ):
         ok = True
-        vowel_cluster_positions = vowel_cluster_positions[:-2]
+        del vowel_cluster_positions[-1]
+        del vowel_cluster_positions[-1]
     elif vowel_clusters_ct == (syl_count - 1) and token[-1] == u'y':
         ok = True
         vowel_cluster_positions.append(len(token) - 1)
@@ -129,6 +130,12 @@ def mark_line(content):
                 result = mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions)
             else:
                 result = mark_lexical_stress_by_prosodic(word, vowel_cluster_positions)
+
+            if result == token:
+                # As a last resort, just mark the first vowel in the word.
+                ok = False
+                result = mark_syllable(token, 'P')
+
             if ok:
                 pass
                 # print (i, vowel_clusters_ct, syl_count, vowel_cluster_positions, token, result)
