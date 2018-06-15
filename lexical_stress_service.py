@@ -93,8 +93,6 @@ def mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions):
 def mark_syllable(syllable, str_stress):
     if str_stress == 'P':
         syllable = syllable.str_orth()
-        if syllable == 'it':
-            print("**************")
         for i, c in enumerate(syllable):
             if c in vowelsy:
                 return mark_lexical_stress(syllable, i)
@@ -113,7 +111,7 @@ def mark_line(content):
     for i, word in enumerate(words):
         if word.isMonoSyllab():
             result = mark_syllable(word.syllables()[0], 'P')
-            print (i, word.token, word.syllables()[0], result)
+            # print (i, word.token, word.syllables()[0], result)
         else:
             vowel_cluster_result = count_vowel_clusters(word)
             vowel_clusters_ct = vowel_cluster_result[0]
@@ -147,9 +145,9 @@ def mark_content(content):
 @app.route("/", methods=['POST'])
 def handle_request():
     content = request.data
-    print "============================="
-    print "content: "
-    print content
+#    print "============================="
+#    print "content: "
+#    print content
     return mark_content(content)
 
 lincoln = """Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.
