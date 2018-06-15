@@ -32,14 +32,14 @@ app = Flask(__name__)
 #         return " ".join([mark_word(word) for word in words])
 #
 
-vowels = 'aeiouAEIOU'
-vowelsy = 'aeiouyAEIOUY'
+vowels = u'aeiouAEIOU'
+vowelsy = u'aeiouyAEIOUY'
 
 
 class VowelClusterCounter:
     def __init__(self, word):
         letter_no = 0
-        token = word.token
+        token = word.token.decode('utf-8')
         vowel_clusters = 0
         while letter_no < len(token):
             if token[letter_no] in vowels:
@@ -52,7 +52,7 @@ class VowelClusterCounter:
 
 def count_vowel_clusters(word):
     letter_no = 0
-    token = word.token
+    token = word.token.decode('utf-8')
     vowel_clusters = 0
     vowel_cluster_positions = []
     while letter_no < len(token):
@@ -67,16 +67,16 @@ def count_vowel_clusters(word):
 
 def revise_cluster_positions(vowel_clusters_ct, vowel_cluster_positions, syl_count, token):
     ok = False
-    if vowel_clusters_ct == (syl_count + 1) and token[-1] == 'e':
+    if vowel_clusters_ct == (syl_count + 1) and token[-1] == u'e':
         ok = True
         vowel_cluster_positions = vowel_cluster_positions[:-1]
     elif vowel_clusters_ct == (syl_count + 1) and (
-            token[-2:] == 'ed'
-            or token[-2:] == 'es'
+            token[-2:] == u'ed'
+            or token[-2:] == u'es'
     ):
         ok = True
         vowel_cluster_positions = vowel_cluster_positions[:-2]
-    elif vowel_clusters_ct == (syl_count - 1) and token[-1] == 'y':
+    elif vowel_clusters_ct == (syl_count - 1) and token[-1] == u'y':
         ok = True
         vowel_cluster_positions.append(len(token) - 1)
     return ok
@@ -88,21 +88,21 @@ def mark_lexical_stress_from_vowel_clusters(word, vowel_cluster_positions):
     syls = word.syllables()
     for i, syl in enumerate(syls):
         if syl.str_stress() == 'P':
-            return mark_lexical_stress(word.token, vowel_cluster_positions[i])
+            return mark_lexical_stress(word.token.decode('utf-8'), vowel_cluster_positions[i])
 
 def mark_syllable(syllable, str_stress):
     if str_stress == 'P':
-        syllable = syllable.str_orth()
+        syllable = syllable.str_orth().decode('utf-8')
         for i, c in enumerate(syllable):
             if c in vowelsy:
                 return mark_lexical_stress(syllable, i)
         return syllable
     else:
-        return syllable.str_orth()
+        return syllable.str_orth().decode('utf-8')
 
 
 def mark_lexical_stress_by_prosodic(word, vowel_cluster_positions):
-    return ''.join([mark_syllable(syllable, syllable.str_stress()) for syllable in word.syllables()])
+    return u''.join([mark_syllable(syllable, syllable.str_stress()) for syllable in word.syllables()])
 
 
 def mark_line(content):
@@ -112,13 +112,13 @@ def mark_line(content):
     for i, word in enumerate(words):
         if word.isMonoSyllab():
             result = mark_syllable(word.syllables()[0], 'P')
-            # print (i, word.token, word.syllables()[0], result)
+            # print (i, word.token.decode('utf-8'), word.syllables()[0], result)
         else:
             vowel_cluster_result = count_vowel_clusters(word)
             vowel_clusters_ct = vowel_cluster_result[0]
             vowel_cluster_positions = vowel_cluster_result[1]
             syl_count = len(word.syllables())
-            token = word.token
+            token = word.token.decode('utf-8')
 
             if vowel_clusters_ct == syl_count:
                 ok = True
@@ -135,17 +135,18 @@ def mark_line(content):
             else:
                 print ('##############', i, vowel_clusters_ct, syl_count, vowel_cluster_positions, token, result)
         results.append(result)
-    return ' '.join(results)
+    return u' '.join(results)
 
 
 def mark_content(content):
     lines = [mark_line(line) for line in content.split('\n')]
-    return '\n'.join(lines)
+    return u'\n'.join(lines)
 
 
 @app.route("/", methods=['POST'])
 def handle_request():
     content = request.data
+    content.encode('utf-8')
 #    print "============================="
 #    print "content: "
 #    print content
